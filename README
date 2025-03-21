@@ -1,0 +1,13 @@
+In order to us the library one needs to obtain a certificate following the steps here:
+https://dune.github.io/computing-HWDB/setup.html
+
+If you have a certificate modify the setup_hwdb.sh file with the specific details then run:
+source setup_hwdb.sh
+
+If you are a developer and would like to push chnages to the git repository please run:
+source clean_repo.sh
+
+The library dune_ce_hwdb.py contains the core libraries.
+Sample user functions are included and can be run using python3
+python3 submit_femb.py 
+
