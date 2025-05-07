@@ -61,6 +61,10 @@ def SubmitColdADCCTSQCTest():
         testfile = testfile[0].rstrip()
 #        print (testfile)
         
+        plotfiles = "ls "+fn+"/*.png"       
+        getplotfiles = os.popen(plotfiles)
+        filelist = getplotfiles.readlines()
+
         with open(testfile) as f:
             for line in f:
 #                print(line.strip())
@@ -71,12 +75,12 @@ def SubmitColdADCCTSQCTest():
                 if test1[0] in tests:
                     index = tests.index(test1[0])
                     value = test1[1].split(" ")
-                #    print(test1[0], test1[1])
+#                    print(test1[0], test1[1])
                 test2 = test.split("=")
                 if test2[0] in tests:
                     index = tests.index(test2[0])
                     value = test2[1].split(" ")
-                #print(index, value)
+#                print(index, value)
                 if index != None and value != None:
                     if index < 6:
                         datasheet[1][index] = "\""+value[1]+"\""
@@ -84,11 +88,21 @@ def SubmitColdADCCTSQCTest():
                         datasheet[1][index] = str(int(float(value[2])))
                     elif index > 6:
                         datasheet[1][index] = value[1]
-                #    print(test2[0], test2[1])
+                    
+        if testtype == "rt":
+            testname = "\"RoomT QC Test\""
+        elif testtype == "ln":
+            testname = "\"CryoT QC Test\""
 
-        if serial == "2315-02158":
-            dune_ce_hwdb.EnterItemToHWDB(serial, "coldadc", "LSU", "US", "", "59", "", "2023-08-10 00:00:00")
-            dune_ce_hwdb.EnterTestToHWDB(serial, "coldadc", testtype, "No comment", datasheet)
+        if serial == "2315-02186" or serial == "2315-02159":
+            
+            #print(filelist)
+            print(datasheet)
+            print(testtype, testname)
+
+            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prep", serial, "LSU", "US", "", "59", "", "2023-08-10 00:00:00")
+            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prep", serial, testname, "No comment", datasheet)
+            dune_ce_hwdb.EnterFileToTest("coldadc_p2prep", serial, testname, datasheet, filelist)
 
 if __name__ == '__main__':
 

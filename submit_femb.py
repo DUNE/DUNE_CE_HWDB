@@ -10,7 +10,7 @@ import subprocess
 import array
 import dune_ce_hwdb
 
-def SubmitFEMB(femb_sn, femb_parts, institution, country_code = "US", comments = "No comment", manufact_id = "58"):
+def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments = "No comment", manufact_id = "58"):
 
     components = []
     for i in range(len(femb_parts)):
@@ -23,12 +23,12 @@ def SubmitFEMB(femb_sn, femb_parts, institution, country_code = "US", comments =
         elif "larasic" in femb_parts[i][0].lower():
             part_type = "larasic"
 
-        component_id = EnterItemToHWDB(femb_parts[i][1], part_type, institution, country_code, comments, manufact_id)
+        component_id = EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, manufact_id)
         row.append(femb_parts[i][0])
         row.append(femb_parts[i][1])
         row.append(component_id)
         components.append(row)
-    dune_ce_hwdb.EnterItemToHWDB(femb_sn, "femb", institution, country_code, comments, manufact_id, components)
+    dune_ce_hwdb.EnterItemToHWDB("femb", femb_sn, institution, country_code, comments, manufact_id, components)
 
 if __name__ == '__main__':
 
@@ -54,5 +54,5 @@ if __name__ == '__main__':
 
 
 
-    SubmitFEMB(femb_sn, femb_parts, "BNL")
+    SubmitFEMB(femb_parts, femb_sn, "BNL")
   
