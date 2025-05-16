@@ -187,7 +187,7 @@ def isTestInHWDB(item_id, qc_tid, qc_date, qc_time):
 
     test_time = "No Test" 
     test_date = "No Test"
-    get_test_data_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/tests/" + qc_tid + "?history=True\' " + "| jq .data[]?.test_data | grep -i -e date -e time"
+    get_test_data_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/tests/" + qc_tid + "?history=True\' " + "| jq .data[]?.test_data | grep -e 'Test Date' -e 'Test Time'"
     if commverb == 'VERB1': print(get_test_data_command)
     command_output = os.popen(get_test_data_command)
     dates = command_output.readlines()
@@ -208,8 +208,8 @@ def isTestInHWDB(item_id, qc_tid, qc_date, qc_time):
             test_num = tids[i].strip()
             if commverb == 'VERB1': print(i, test_date, test_time, test_num)
 
-#            print(qc_date, qc_time)
-#            print(test_date, test_time)
+            if commverb == 'VERB1': print(qc_date, qc_time)
+            if commverb == 'VERB1': print(test_date, test_time)
             if (test_date == qc_date) and (test_time == qc_time):
                 found_test = True
                 found_test_id = test_num
