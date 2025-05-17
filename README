@@ -1,13 +1,17 @@
 In order to us the library one needs to obtain tokens following the steps here:
 https://dune.github.io/computing-HWDB/setup.html
 
-If you have obtained the tokens, modify the setup_hwdb.sh file with the location of the bearer token and then run:
+If you have obtained the tokens, modify the setup_hwdb.sh file with the location of the bearer token.
+The choice of the "Production" or the "Developer" version is set by providing "PROD" or "DEV" in the
+respective variable. Furthermore, the verbocity environmetal variable can take values "VERB0" and "VERB1".
+In order for all changes to take effect run:
 source setup_hwdb.sh
 
-If you are a developer and would like to push chnages to the git repository please run:
+If you are a developer and would like to push changes to the git repository, before you commit the changes
+please remove the auxillary file by running:
 source clean_repo.sh
 
 The library dune_ce_hwdb.py contains the core REST API functions.
-Sample user functions are included and can be run using python3
+Sample user functions are included and can be run using python3. For example:
 python3 submit_femb.py 
 
