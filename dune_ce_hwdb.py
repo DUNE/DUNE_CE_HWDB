@@ -25,8 +25,8 @@ file_upload_command = " -F \"image=@"
 loc_name_list       = ["FNAL", "BNL", "MSU", "LSU", "LBL", "UCI", "UPENN", "UCINCI"]
 loc_id_list         = ["1", "128", "146", "144", "142", "171", "191", "176"]
 
-part_name_list      = ["larasic_p5prep1", "larasic_p5prep2", "coldadc_p2prep", "coldadc_p2prb1", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep"]
-part_id_list        = ["D08100100001", "D08100100003", "D08100200001", "D08100200002", "D08100300001", "D08100300002", "D08100300003", "D08100400001"]
+part_name_list      = ["larasic_p5prep1", "larasic_p5prep2", "coldadc_p2prep", "coldadc_p2prb1", "coldadc_p2prb2", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep"]
+part_id_list        = ["D08100100001", "D08100100003", "D08100200001", "D08100200002", "D08100200003", "D08100300001", "D08100300002", "D08100300003", "D08100400001"]
 
 item_upload_json = "item_to_upload.json"
 add_loc_json     = "add_location.json"
@@ -289,7 +289,7 @@ def ItemToUploadJSON(item_sn, part_type_id, institution, country_code = "US", co
     if connectors != None:
         item_file.write("\t},\n")
         item_file.write("\t\"subcomponents\": {\n")
-        if part_name_list[part_id_list.index(part_type_id)] == "femb":    
+        if "femb" in part_name_list[part_id_list.index(part_type_id)]:    
             for i in range(len(connectors)):
                 if i == (len(connectors)-1):
                     item_file.write("\t\t\""+connectors[i][0].rstrip(' SN')+"\": \""+ connectors[i][2]+"\"\n")
@@ -494,7 +494,7 @@ def EnterFileToItem(item_name, item_sn, filelist = None):
         print("File list is empty. Please provide at least one file to upload.")
         return None
     else:
-        images_list = GetItemFilesInHWDB(test_id)
+        images_list = GetItemFilesInHWDB(item_id)
         for file in filelist:
             filetoupload = file.strip()
             filetocheck = filetoupload.split("/")

@@ -64,6 +64,7 @@ def SubmitColdADCCTSQCTest():
         plotfiles = "ls "+fn+"/*.png"       
         getplotfiles = os.popen(plotfiles)
         filelist = getplotfiles.readlines()
+#        print(len(filelist))
 
         with open(testfile) as f:
             for line in f:
@@ -94,15 +95,17 @@ def SubmitColdADCCTSQCTest():
         elif testtype == "ln":
             testname = "\"CryoT QC Test\""
 
-        if serial == "2315-02186" or serial == "2315-02159":
+        if serial == "2502-18586":# or serial == "2315-02159":
             
             #print(filelist)
             print(datasheet)
             print(testtype, testname)
 
-            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prep", serial, "LSU", "US", "", "59", "", "2023-08-10 00:00:00")
-            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prep", serial, testname, "No comment", datasheet)
-            dune_ce_hwdb.EnterFileToTest("coldadc_p2prep", serial, testname, datasheet, filelist)
+            #dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "FNAL", "US", "", "59", "NBMY62.00", "2025-01-10 00:00:00")
+            #dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "LSU", "US", "", "59", "NBMY62.00", "2025-02-27 00:00:00")
+            #dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "BNL", "US", "", "59", "NBMY62.00", "2025-06-04 00:00:00")
+            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prb2", serial, testname, "No comment", datasheet)
+            dune_ce_hwdb.EnterFileToTest("coldadc_p2prb2", serial, testname, datasheet, filelist)
 
 if __name__ == '__main__':
 
