@@ -12,6 +12,7 @@ import array
 tokenloc=os.environ.get('TOKENLOC')
 hwdbsel=os.environ.get('HWDBSELECT')
 commverb=os.environ.get('COMMANDVERB')
+siteloc=os.environ.get('SITELOC')
 
 upload_url = "https://dbwebapi2.fnal.gov:8443/cdbdev/api"
 if hwdbsel == 'PROD':
@@ -96,6 +97,66 @@ def getSummary(item_name, location = None):
         return None
     else:
         return numitems[0].strip()
+
+def GetItemSN(item_id):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+
+    enter_info_download_command = curl_command +" \'" + download_url + "/components/" + item_id + "\' "+" | jq .data.serial_number"
+    if commverb == 'VERB1': print(enter_info_download_command)
+    
+    datain     = os.popen(enter_info_download_command)
+    serial  = datain.readlines()
+    serial  = serial[0].strip()
+    serial  = serial.strip("\"")
+#    print(serial)
+
+    return serial
+
+def GetItemName(item_id):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+
+    enter_info_download_command = curl_command +" \'" + download_url + "/components/" + item_id + "\' "+" | jq .data.component_type.name"
+    if commverb == 'VERB1': print(enter_info_download_command)
+    
+    datain     = os.popen(enter_info_download_command)
+    name  = datain.readlines()
+    name  = name[0].strip()
+    name  = name.strip("\"")
+#    print(name)
+
+    return name
+
+
+def GetItemLocation(item_id):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+
+    enter_info_download_command = curl_command +" \'" + download_url + "/components/" + item_id + "\' "+" | jq .data.location"
+    if commverb == 'VERB1': print(enter_info_download_command)
+    
+    datain     = os.popen(enter_info_download_command)
+    loc  = datain.readlines()
+    loc  = loc[0].strip()
+    loc  = loc.strip("\"")
+#    print(name)
+
+    return loc
+
+def GetPartList(item_name):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+    if item_name in part_name_list:
+        item_part_id = part_id_list[part_name_list.index(item_name)]
+    else:
+        print("Part name is not recognized. Accepted Part names are:")
+        print(part_name_list)
+        exit(1)
+
+    if commverb == 'VERB1': print(item_name, item_part_id)
+    get_partid_command = curl_command + " \'" + download_url + "/component-types/" + item_part_id + "/components\' "+" | jq .data[].part_id"
+    if commverb == 'VERB1': print(get_partid_command)
+ 
+    datain = os.popen(get_partid_command)
+    parts = datain.readlines()
+    return parts
 
 def isPartInHWDB(item_name, item_sn):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
@@ -318,7 +379,7 @@ def GetCurrentLocation(item_id):
         #print(latest_loc)
     return latest_loc,latest_loc_name    
 
-def UpdateLocation(item_id, institution, comments = "", arrival_date = None):
+def UpdateLocation(item_id, institution = siteloc, comments = "", arrival_date = None):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
 
     if arrival_date != None and not(checkTimeFormat(arrival_date)):
