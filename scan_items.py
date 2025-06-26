@@ -23,9 +23,11 @@ if __name__ == '__main__':
         item_id = item[len(item)-1]
         part_name =  dune_ce_hwdb.GetItemName(item_id)
         part_sn   =  dune_ce_hwdb.GetItemSN(item_id)
-        print("Confirm with \"Y\" location change for item: "+part_name+" with SN "+part_sn)
+        part_loc  =  dune_ce_hwdb.GetItemLocation(item_id)
+        print("Current location for part \'"+part_name+"\' with SN \'"+part_sn+"\' is "+part_loc)
+#        print("Confirm with \"Y\" location change for item: "+part_name+" with SN "+part_sn)
         
-        conf = input("\n")
+        conf = input("Please confirm with \"Y\" the change of location.\n")
         if conf == "Y":
             dune_ce_hwdb.UpdateLocation(item_id)
 
