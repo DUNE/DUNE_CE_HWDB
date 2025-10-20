@@ -23,8 +23,15 @@ if __name__ == '__main__':
             part_name =  dune_ce_hwdb.GetItemName(item_id)
             part_sn   =  dune_ce_hwdb.GetItemSN(item_id)
             part_loc  =  dune_ce_hwdb.GetItemLocation(item_id)
+            test_fields, test_values=  dune_ce_hwdb.GetItemTests(item_id)
             #print(item_id, part_name, part_sn, part_loc)
-            fcsv.write(item_id+", "+part_name+", "+part_sn+", "+part_loc+"\n")
+            fcsv.write(item_id+", "+part_name+", "+part_sn+", "+part_loc)
 
+            if test_values != None:
+                for i in range(len(test_values)):
+                    fcsv.write(", "+test_values[i])
+
+            fcsv.write("\n")
+            #exit()
             
 

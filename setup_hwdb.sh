@@ -1,6 +1,6 @@
 htgettoken --vaultserver=htvaultprod.fnal.gov --issuer=fermilab
 
-export TOKENLOC='/run/user/1000/bt_u1000'
+export TOKENLOC='/run/user/526/bt_u526'
 export HWDBSELECT='DEV'
 export COMMANDVERB='VERB1'
 export SITELOC='LSU'

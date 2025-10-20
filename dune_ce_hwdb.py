@@ -22,16 +22,18 @@ curl_command   = "curl -s --header \"Authorization: Bearer $(cat "+tokenloc+")\"
 download_url   = upload_url+"/v1"
 upload_command = " -H \"Content-Type: application/json\" -X POST -d @"
 file_upload_command = " -F \"image=@"
+patch_command  = " -H \"Content-Type: application/json\" -X PATCH -d @"
 
 loc_name_list       = ["FNAL", "BNL", "MSU", "LSU", "LBL", "UCI", "UPENN", "UCINCI"]
 loc_id_list         = ["1", "128", "146", "144", "142", "171", "191", "176"]
 
-part_name_list      = ["larasic_p5prep1", "larasic_p5prep2", "coldadc_p2prep", "coldadc_p2prb1", "coldadc_p2prb2", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep"]
-part_id_list        = ["D08100100001", "D08100100003", "D08100200001", "D08100200002", "D08100200003", "D08100300001", "D08100300002", "D08100300003", "D08100400001"]
+part_name_list      = ["larasic_p5prep1", "larasic_p5bprep2", "larasic_p5bpr1", "coldadc_p2prep", "coldadc_p2prb1", "coldadc_p2prb2", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep", "wiec", "wib"]
+part_id_list        = ["D08100100001", "D08100100003", "D08100100004", "D08100200001", "D08100200002", "D08100200003", "D08100300001", "D08100300002", "D08100300003", "D08100400001", "D08104100001", "D08104200001"]
 
-item_upload_json = "item_to_upload.json"
+item_upload_json = "upload_item.json"
 add_loc_json     = "add_location.json"
-test_upload_json = "test_upload_1.json"
+test_upload_json = "upload_test.json"
+patch_item_json  = "patch_item.json"
 
 #class DUNECE_HWDB:
 
@@ -141,6 +143,105 @@ def GetItemLocation(item_id):
 
     return loc
 
+def GetItemTests(item_id):
+    global curl_command, upload_url, download_url
+    found_test = False
+    found_test_id = 0
+
+    test_time = "No Test" 
+    test_date = "No Test"
+    get_test_data_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/tests' | jq .data[].test_type"
+    if commverb == 'VERB1': print(get_test_data_command)
+    command_output = os.popen(get_test_data_command)
+    test_type_ids = command_output.readlines()
+    print(test_type_ids)
+
+    print(len(test_type_ids))
+    if len(test_type_ids)//4 > 0:
+
+        testsList = []
+        itest = 0
+        test_data = None
+        test_name = None
+        qc_tid = None
+        num_tests = None
+        num_fields= None
+        for test_tid in test_type_ids:
+
+            qc_tid_line = test_tid.strip()
+            qc_tid_line = qc_tid_line.split(":")
+            if qc_tid_line[0] == "{":
+                itest = itest + 1
+            elif qc_tid_line[0] == '\"name\"':
+                test_name = qc_tid_line[1].rstrip(",")
+            elif qc_tid_line[0] == '\"id\"':
+                qc_tid = qc_tid_line[1].rstrip(",")
+                qc_tid = qc_tid.lstrip(" ")
+            elif qc_tid_line[0] == "}":
+                print(itest,test_name,qc_tid)
+                for it in range(num_tests):
+                    test_data.insert(1+it*num_fields, test_name)
+                testsList = testsList + test_data
+                test_name = None
+                qc_tid = None
+                num_tests = None
+                num_fields = None
+
+            if qc_tid != None: 
+                get_tests_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/tests/" + qc_tid + "?history=True\' " + "| jq .data[].test_data"
+                if commverb == 'VERB1': print(get_tests_command)
+                command_output = os.popen(get_tests_command)
+                test_data = command_output.readlines()
+                print(test_data.count("{\n"), len(test_data))
+                num_tests = test_data.count("{\n")
+                num_fields= int(len(test_data)/num_tests)
+
+        field_list, value_list = FormatInputList(testsList)
+        for i in range(len(field_list)):
+            print(field_list[i], value_list[i])
+        print(field_list.count("\"Test\""))
+    if len(test_type_ids)>0:   
+        return field_list, value_list
+    else:
+        return None, None
+
+def FormatInputList(inp_list):
+
+    field_list = []
+    value_list = []
+    for line in inp_list:
+        strline = line.strip()
+        strline = strline.rstrip(",")
+        strline = strline.lstrip(" ")
+        splline = strline.split(":")
+        #print(len(splline))
+        if len(splline) == 1:
+            if splline[0] != "{" and splline[0] != "}":
+                value_list.append(splline[0])
+                field_list.append("Test")
+        elif len(splline) == 2:
+            field_list.append(splline[0])
+            value_list.append(splline[1])
+        elif len(splline) > 2:
+            field_list.append(splline[0])
+            value_list.append(splline[1]+":"+splline[2])
+
+    return field_list, value_list    
+
+def GetParent(item_id):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+    get_parent_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/container' | jq .data[].container.part_id"
+    if commverb == 'VERB1': print(get_parent_command)
+    command_output = os.popen(get_parent_command)
+    parent = command_output.readlines()
+    
+    if len(parent)>0:
+        parent_id = parent[0].strip()
+        parent_id = parent_id.strip("\"")
+        return parent_id
+    else:
+        return None
+
 def GetPartList(item_name):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
     if item_name in part_name_list:
@@ -149,14 +250,42 @@ def GetPartList(item_name):
         print("Part name is not recognized. Accepted Part names are:")
         print(part_name_list)
         exit(1)
+    
+    numItems = getSummary(item_name)
+    numPages = int(numItems)//100 + 1
+    print (numItems, numPages)
 
-    if commverb == 'VERB1': print(item_name, item_part_id)
-    get_partid_command = curl_command + " \'" + download_url + "/component-types/" + item_part_id + "/components\' "+" | jq .data[].part_id"
-    if commverb == 'VERB1': print(get_partid_command)
+    partsList = []
+    for i in range(numPages):
+        page = str(i+1)
+        if commverb == 'VERB1': print(item_name, item_part_id)
+        get_partid_command = curl_command + " \'" + download_url + "/component-types/" + item_part_id + "/components?page="+page+"&size=100\' "+" | jq .data[].part_id"
+        if commverb == 'VERB1': print(get_partid_command)
  
-    datain = os.popen(get_partid_command)
-    parts = datain.readlines()
-    return parts
+        datain = os.popen(get_partid_command)
+        parts = datain.readlines()
+        partsList = partsList + parts
+    return partsList
+
+def GetSubcomponents(item_id):
+    global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
+    get_subcomp_command = curl_command + " \'" + download_url + "/components/" + item_id.strip() + "/subcomponents' | jq .data[] | grep -e 'functional_position' -e 'part_id'"
+    if commverb == 'VERB1': print(get_subcomp_command)
+    command_output = os.popen(get_subcomp_command)
+    subcomps = command_output.readlines()
+    #print(subcomps)
+    subcomp_pos = []
+    subcomp_pid = []
+    if len(subcomps)>0:
+        field_names, values = FormatInputList(subcomps)
+        for i in range(int(len(values)/2)):
+            subcomp_pos.append(values[2*i].strip(" "))
+            subcomp_pid.append((values[2*i+1].strip(" ")).strip("\""))
+
+    if len(subcomp_pos) > 0:
+        return subcomp_pos, subcomp_pid
+    else:
+        return None, None
 
 def isPartInHWDB(item_name, item_sn):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list

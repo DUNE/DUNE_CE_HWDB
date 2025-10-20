@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WIB_02 Calibration Test Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .section h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .slots {
+            margin: 10px 0;
+            padding-left: 15px;
+        }
+        .slot {
+            margin: 5px 0;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .value {
+            margin-left: 10px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-style: italic;
+            color: #666;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h2>Calibration Test Report</h2>
+
+    <div class="section">
+        <h3>1. Test Four SLOT with DAC voltage</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">0.914 [0.9–1.1]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">0.9134 [0.9–1.1]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">0.9494 [0.9–1.1]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">0.9508 [0.9–1.1]</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>2. Test Four SLOT with Ref voltage</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">1.6483 [1.6–1.7]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">1.6476 [1.6–1.7]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">1.6507 [1.6–1.7]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">1.6507 [1.6–1.7]</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>3. Test SLOT1_output SLOT2_input SLOT3_output SLOT4_input with DAC voltage</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">0.5229 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">0.5215 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">0.5258 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">0.5247 [0.5–0.55]</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>4. Test SLOT1_input SLOT2_output SLOT3_input SLOT4_output with DAC voltage</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">0.5222 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">0.5223 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">0.5241 [0.5–0.55]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">0.5255 [0.5–0.55]</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>5. Test LEMO P5 Calibration pulse injection</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">0.7378 [0.7–0.85]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">0.7372 [0.7–0.85]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">0.7393 [0.7–0.85]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">0.7581 [0.7–0.85]</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>6. Test Points</h3>
+        <div class="slots">
+            <div class="slot"><span class="label">SLOT0:</span><span class="value">0.0053 [0–0.5]</span></div>
+            <div class="slot"><span class="label">SLOT1:</span><span class="value">0.0056 [0–0.5]</span></div>
+            <div class="slot"><span class="label">SLOT2:</span><span class="value">0.0066 [0–0.5]</span></div>
+            <div class="slot"><span class="label">SLOT3:</span><span class="value">0.408 [0–0.5]</span></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Time Consumption = 119.346
+    </div>
+</body>
+</html>
