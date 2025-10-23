@@ -27,8 +27,8 @@ patch_command  = " -H \"Content-Type: application/json\" -X PATCH -d @"
 loc_name_list       = ["FNAL", "BNL", "MSU", "LSU", "LBL", "UCI", "UPENN", "UCINCI"]
 loc_id_list         = ["1", "128", "146", "144", "142", "171", "191", "176"]
 
-part_name_list      = ["larasic_p5prep1", "larasic_p5bprep2", "larasic_p5bpr1", "coldadc_p2prep", "coldadc_p2prb1", "coldadc_p2prb2", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep", "wiec", "wib"]
-part_id_list        = ["D08100100001", "D08100100003", "D08100100004", "D08100200001", "D08100200002", "D08100200003", "D08100300001", "D08100300002", "D08100300003", "D08100400001", "D08104100001", "D08104200001"]
+part_name_list      = ["larasic_p5prep1", "larasic_p5bprep2", "larasic_p5bpr1", "coldadc_p2prep", "coldadc_p2prb1", "coldadc_p2prb2", "coldata_e4prep", "coldata_e4prb1", "coldata_e4prb2", "femb_prep", "wiec", "wib","ptc","ptc_fpga"]
+part_id_list        = ["D08100100001", "D08100100003", "D08100100004", "D08100200001", "D08100200002", "D08100200003", "D08100300001", "D08100300002", "D08100300003", "D08100400001", "D08104100001", "D08104200001","D08104300001","D08100800011"]
 
 item_upload_json = "upload_item.json"
 add_loc_json     = "add_location.json"

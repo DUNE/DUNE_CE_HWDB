@@ -10,7 +10,7 @@ import array
 import dune_ce_hwdb
 
 
-def SubmitColdADCCTSQCTest():
+def SubmitWIBQCTest():
     tests = [
     "Test Date",
     "Test Time",
@@ -71,11 +71,11 @@ def SubmitColdADCCTSQCTest():
         print(datasheet)
         print(testname)
 
-#        dune_ce_hwdb.EnterItemToHWDB("wib", serial, "BNL", "US", "", "58")
-#        dune_ce_hwdb.EnterTestToHWDB("wib", serial, testname, "No comment", datasheet)
+        dune_ce_hwdb.EnterItemToHWDB("wib", serial, "BNL", "US", "", "58")
+        dune_ce_hwdb.EnterTestToHWDB("wib", serial, testname, "No comment", datasheet)
         dune_ce_hwdb.EnterFileToTest("wib", serial, testname, datasheet, filelist)
 
 if __name__ == '__main__':
 
-    SubmitColdADCCTSQCTest()
+    SubmitWIBQCTest()
 
