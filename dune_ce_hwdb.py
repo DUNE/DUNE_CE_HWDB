@@ -479,15 +479,16 @@ def ItemToUploadJSON(item_sn, part_type_id, institution, country_code = "US", co
     if connectors != None:
         item_file.write("\t},\n")
         item_file.write("\t\"subcomponents\": {\n")
-        if "femb" in part_name_list[part_id_list.index(part_type_id)]:    
-            for i in range(len(connectors)):
-                if i == (len(connectors)-1):
-                    item_file.write("\t\t\""+connectors[i][0].rstrip(' SN')+"\": \""+ connectors[i][2]+"\"\n")
-                else:    
-                    item_file.write("\t\t\""+connectors[i][0].rstrip(' SN')+"\": \""+ connectors[i][2]+"\",\n")
-            item_file.write("\t}\n")
+        #if "femb" in part_name_list[part_id_list.index(part_type_id)]:    
+        for i in range(len(connectors)):
+            if i == (len(connectors)-1):
+                item_file.write("\t\t\""+connectors[i][0].rstrip(' SN')+"\": \""+ connectors[i][2]+"\"\n")
+            else:    
+                item_file.write("\t\t\""+connectors[i][0].rstrip(' SN')+"\": \""+ connectors[i][2]+"\",\n")
+        item_file.write("\t}\n")
     else:
         item_file.write("\t}\n")
+#    item_file.write("\t}\n")
     item_file.write("}\n")
     item_file.close()
 

@@ -1,0 +1,174 @@
+################################################################################
+# Sample PTC QC Report
+ Test Date: 12-01-2025
+ Test Time: 13:00
+ Operator Name: A. Nikolica
+ 
+################################################################################
+
+### CHECKOUT RECEPTION TESTS ###
+# The results of the *bare* PCB visual inspection are in 
+# "PTC PCB Inspection Bare.xlsx"
+# This is done once for each batch of PCBs upon reception.
+# The results of the *assembled* PCB visual inspection are in 
+# "PTC PCB Inspection Assy.xlsx"
+# Note: front panels are not individually tracked as part of QC
+
+### QC TESTS (ONE REPORT PER PTC) ###
+# An image of the PTC is "assembled_pcb_004.png" in this directory
+PTC_VISUAL: PASS
+PTC_SERIAL: 004
+
+# The following measurements are manually performed with DVM or oscilloscope.
+# In the future, we will have a test scripts that prompts the tester for the 
+# measurement, and automatically generates this file.
+
+POWER_ON_WO_SOM 90mA PASS
+VP12_LOCAL 12.1V PASS
+VP12_LOCAL_LED: PASS
+
+# Note: the switching frequency oscilloscope screenshots should be stored
+# in the HWDB, even though the frequency is read off the screen and 
+# entered here manually. An example "dcdc_switching_004.png" is included
+# in this directory.
+WIB0_12V: 12.1V PASS
+WIB0_SW_FREQ: 920kHz PASS
+WIB0_LED: PASS
+WIB1_12V: 12.1V PASS
+WIB1_SW_FREQ: 920kHz PASS
+WIB1_LED: PASS
+WIB2_12V: 12.1V PASS
+WIB2_SW_FREQ: 920kHz PASS
+WIB2_LED: PASS
+WIB3_12V: 12.1V PASS
+WIB3_SW_FREQ: 920kHz PASS
+WIB3_LED: PASS
+WIB4_12V: 12.1V PASS
+WIB4_SW_FREQ: 920kHz PASS
+WIB4_LED: PASS
+WIB5_12V: 12.1V PASS
+WIB5_SW_FREQ: 920kHz PASS
+WIB5_LED: PASS
+
+# SoM insertion tests
+SOM_SERIAL: 2230802025
+SOM_INSERT: PASS
+
+# Boot tests
+12V_LOCAL_LED: PASS
+PG_LED: PASS
+FPGA_DONE_LED: PASS
+SERIAL_PORT: PASS
+REPEAT_BOOT: PASS
+
+# Load tests
+# An example "dcdc_ripple_004.png" is included in this directory.
+WIB0_25P_LOAD: 1.6A PASS
+WIB0_50P_LOAD: 3.1A PASS
+WIB0_75P_LOAD: 4.6A PASS
+WIB0_100P_LOAD: 6.1A PASS
+WIB0_RIPPLE: 80mV PASS
+WIB1_25P_LOAD: 1.6A PASS
+WIB1_50P_LOAD: 3.1A PASS
+WIB1_75P_LOAD: 4.6A PASS
+WIB1_100P_LOAD: 6.1A PASS
+WIB1_RIPPLE: 80mV PASS
+WIB2_25P_LOAD: 1.6A PASS
+WIB2_50P_LOAD: 3.1A PASS
+WIB2_75P_LOAD: 4.6A PASS
+WIB2_100P_LOAD: 6.1A PASS
+WIB2_RIPPLE: 80mV PASS
+WIB3_25P_LOAD: 1.6A PASS
+WIB3_50P_LOAD: 3.1A PASS
+WIB3_75P_LOAD: 4.6A PASS
+WIB3_100P_LOAD: 6.1A PASS
+WIB3_RIPPLE: 80mV PASS
+WIB4_25P_LOAD: 1.6A PASS
+WIB4_50P_LOAD: 3.1A PASS
+WIB4_75P_LOAD: 4.6A PASS
+WIB4_100P_LOAD: 6.1A PASS
+WIB4_RIPPLE: 80mV PASS
+WIB5_25P_LOAD: 1.6A PASS
+WIB5_50P_LOAD: 3.1A PASS
+WIB5_75P_LOAD: 4.6A PASS
+WIB5_100P_LOAD: 6.1A PASS
+WIB5_RIPPLE: 80mV PASS
+
+# I2C sensor output
+# Note: the raw sensor output from start_i2c_test.py on the PTC
+# will be parsed by a test script (to be written) on our local Linux test 
+# machine to populate these fields.
+WIB0_I2C_VOLTAGE: 12.1V PASS
+WIB0_I2C_CURRENT: 1.6A PASS
+WIB1_I2C_VOLTAGE: 12.1V PASS
+WIB1_I2C_CURRENT: 1.6A PASS
+WIB2_I2C_VOLTAGE: 12.1V PASS
+WIB2_I2C_CURRENT: 1.6A PASS
+WIB3_I2C_VOLTAGE: 12.1V PASS
+WIB3_I2C_CURRENT: 1.6A PASS
+WIB4_I2C_VOLTAGE: 12.1V PASS
+WIB4_I2C_CURRENT: 1.6A PASS
+WIB5_I2C_VOLTAGE: 12.1V PASS
+WIB5_I2C_CURRENT: 1.6A PASS
+VP12_LOCAL_I2C_VOLTAGE: 12.1V PASS
+VP12_LOCAL_I2C_CURRENT: 720mA PASS
+V2P5_LOCAL_VOLTAGE: 2.4V PASS
+V2P5_LOCAL_CURRENT: 240mA PASS
+V3P3_LOCAL_VOLTAGE: 3.2V PASS
+V3P3_LOCAL_CURRENT: 800mA PASS
+TEMP_LOCAL: 25.5C PASS
+TEMP_SOM: 30C PASS
+TEMP_0: 25.9C PASS
+TEMP_1: 25.2C PASS
+TEMP_2: 25.6C PASS
+TEMP_3: 25.8C PASS
+TEMP_4: 25.7C PASS
+TEMP_5: 25.9C PASS
+WIB0_ALARM: PASS
+WIB1_ALARM: PASS
+WIB2_ALARM: PASS
+WIB3_ALARM: PASS
+WIB4_ALARM: PASS
+WIB5_ALARM: PASS
+TEMP_LOCAL_ALARM: PASS
+TEMP_SOM_ALARM: PASS
+TEMP_0_ALARM: PASS
+TEMP_1_ALARM: PASS
+TEMP_2_ALARM: PASS
+TEMP_3_ALARM: PASS
+TEMP_4_ALARM: PASS
+TEMP_5_ALARM: PASS
+
+# Crate address test
+CRATE_ADDR_DIP: PASS
+
+# EEPROM test
+EEPROM_SERIAL: 
+EEPROM_TEST: PASS
+
+# MCU tests
+PROGRAM_JTAG: PASS
+PROGRAM_IN_SITU: PASS
+ECAT_LINK_LED: PASS
+TWINCAT_LINK: PASS
+ECAT_RUN_LED: PASS
+
+# Timing tests
+TIMING_LOCK: PASS
+TIMING_LINK_LED: PASS
+TIMING_LOCK_LED: PASS
+TIMING_RTT: PASS
+TIMING_TX_LED: PASS
+
+#Ethernet tests
+GBE_LINK_LED: PASS
+PING_TEST: PASS
+THROUGHPUT_TEST: 14MBps PASS
+AUX_LED: PASS
+
+# Note: heatsink and front panel tests have no acceptance criteria, 
+# but must be completed before the board is cleared for shipment.
+
+OVERALL_RESULT: PASS
+
+### END OF REPORT ###
