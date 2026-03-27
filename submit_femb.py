@@ -42,12 +42,13 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
 
         
 
-        component_id = dune_ce_hwdb.EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, "59")
+        #component_id = dune_ce_hwdb.EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, "59")
+        component_id = dune_ce_hwdb.isPartInHWDB(part_type, femb_parts[i][1])
         row.append(femb_parts[i][0])
         row.append(femb_parts[i][1])
         row.append(component_id)
         components.append(row)
-    dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, None, None, components)
+    dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, "Blah", None, components, components)
     dune_ce_hwdb.EnterFileToItem("femb_prep", femb_sn, filelist)
 
 if __name__ == '__main__':

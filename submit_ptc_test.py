@@ -39,7 +39,7 @@ def SubmitPTCQCTest():
         sn = fn.split("/")
         print(fn, sn[len(sn)-1])
         reportfile_name = fn+"/qc_data.txt"
-        datasheet[1][2] = "\"UPENN\""
+        datasheet[1][2] = "UPENN"
         parameter = 0
         with open(reportfile_name) as f:
             for line in f:
@@ -51,11 +51,11 @@ def SubmitPTCQCTest():
                 line_cont = line_cont.split(":")
                 if len(line_cont)>1:
                     if line_cont[0] == 'Operator Name':
-                        datasheet[1][3] = "\""+line_cont[1].strip()+"\""
+                        datasheet[1][3] = line_cont[1].strip()
                     elif line_cont[0] == 'Test Date':
-                        datasheet[1][0] = "\""+line_cont[1].strip()+"\""
+                        datasheet[1][0] = line_cont[1].strip()
                     elif line_cont[0] == 'Test Time':    
-                        datasheet[1][1] = "\""+line_cont[1].strip()+":"+line_cont[2].strip()+"\""
+                        datasheet[1][1] = line_cont[1].strip()+":"+line_cont[2].strip()
                     elif line_cont[0] == 'PTC_SERIAL':
                         serial = line_cont[1].strip()
                     elif line_cont[0] == 'SOM_SERIAL':
@@ -63,7 +63,7 @@ def SubmitPTCQCTest():
                     else:
 #                        print(parameter+4)
                         datasheet[0][parameter+4] = line_cont[0].strip()
-                        datasheet[1][parameter+4] = "\""+line_cont[1].strip()+"\""
+                        datasheet[1][parameter+4] = line_cont[1].strip()
                         #print(parameter+4, line_cont[0].strip(), "\""+line_cont[1].strip()+"\"")
                         parameter = parameter + 1
 
@@ -83,7 +83,7 @@ def SubmitPTCQCTest():
         getphotofiles = os.popen(ptc_photo_name)
         ptc_photo_file = getphotofiles.readlines()
         print(ptc_photo_file)
-        testname = "\"QC Test\""
+        testname = "QC Test"
             
             #print(filelist)
         print(serial)    

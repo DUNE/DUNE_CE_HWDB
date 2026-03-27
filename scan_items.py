@@ -21,9 +21,10 @@ if __name__ == '__main__':
         scanned = val.strip()
         item = scanned.split("/")
         item_id = item[len(item)-1]
-        part_name =  dune_ce_hwdb.GetItemName(item_id)
-        part_sn   =  dune_ce_hwdb.GetItemSN(item_id)
-        part_loc  =  dune_ce_hwdb.GetItemLocation(item_id)
+        part_name, part_sn, dummy, dummy, part_loc, dummy, dummy, dummy, dummy, dummy = dune_ce_hwdb.GetItemDetails(item_id)
+        #part_name =  dune_ce_hwdb.GetItemName(item_id)
+        #part_sn   =  dune_ce_hwdb.GetItemSN(item_id)
+        #part_loc  =  dune_ce_hwdb.GetItemLocation(item_id)
         print("Current location for part \'"+part_name+"\' with SN \'"+part_sn+"\' is "+part_loc)
 #        print("Confirm with \"Y\" location change for item: "+part_name+" with SN "+part_sn)
         

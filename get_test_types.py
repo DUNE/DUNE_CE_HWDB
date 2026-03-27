@@ -10,8 +10,8 @@ if __name__ == '__main__':
     else: 
         partName = sys.argv[1]
 
-    qc_tid, qc_type = dune_ce_hwdb.GetTestTypeID(partName, "Blah")
 
+    blah = dune_ce_hwdb.GetTestTypeID(partName, "Blah")
 
 
 

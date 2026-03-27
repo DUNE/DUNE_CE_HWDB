@@ -33,6 +33,8 @@ def SubmitColdADCCTSQCTest():
     getnames = os.popen("ls -d  /scratch/mtzanov/DUNE_CE/ColdADC/test_results/*")
     filenames = getnames.readlines()
     prev = 0
+    prev_sn = 0
+    num_chips = 0
     for fn in filenames:
         datasheet = [[None for _ in range(10)] for _ in range(2)]
 
@@ -55,9 +57,10 @@ def SubmitColdADCCTSQCTest():
         date = time[0][0:4]+"/"+time[0][4:6]+"/"+time[0][6:8]
         testtime = time[1][0:2]+":"+time[1][2:4]
         if sn[serofs] == "2422" or sn[serofs] == "2502":
-            serial = sn[serofs]+"-"+sn[batofs]
-        else:
-            serial = sn[batofs]+"-"+sn[serofs]
+            continue
+#            serial = sn[serofs]+"-"+sn[batofs]
+#        else:
+        serial = sn[batofs]+"-"+sn[serofs]
         testtype = sn[testofs]
         testfilename = "ls "+fn+"/*.txt"
 
@@ -72,9 +75,9 @@ def SubmitColdADCCTSQCTest():
     #if(prev != sn[3]):
 #        print (asic[1],", ",serial, ", ", sn[4], ", ", date, ", ", testtime)
     #prev = sn[3]
-        datasheet[1][0] = "\""+date+"\""
-        datasheet[1][1] = "\""+testtime+"\""
-        datasheet[1][2] = "\"LSU\""
+        datasheet[1][0] = date
+        datasheet[1][1] = testtime
+        datasheet[1][2] = "LSU"
         getfile = os.popen(testfilename)
         testfile = getfile.readlines()
         testfile = testfile[0].rstrip()
@@ -109,29 +112,32 @@ def SubmitColdADCCTSQCTest():
 #                print(index, value)
                 if index != None and value != None:
                     if index < 6:
-                        datasheet[1][index] = "\""+value[1]+"\""
-                    elif index == 6 and datasheet[1][index] == None:
-                        datasheet[1][index] = str(int(float(value[2])))
-                    elif index > 6:
                         datasheet[1][index] = value[1]
+                    elif index == 6 and datasheet[1][index] == None:
+                        datasheet[1][index] = round(float(value[2]),2)
+                    elif index > 6:
+                        datasheet[1][index] = float(value[1])
                     
         if testtype == "rt":
-            testname = "\"RoomT QC Test\""
+            testname = "RoomT QC Test"
         elif testtype == "ln":
-            testname = "\"CryoT QC Test\""
+            testname = "CryoT QC Test"
 #        filelist_pdf = [testfile, pdf_plot_report_name]
-        if sn[batofs] == "2502":# and testtype =="ln":# and serial == "2502-18611":
+        if (serial == "2502-18554"): #and prev_sn != serial and testtype =="rt":# and serial == "2502-18611":
+            prev_sn = serial
+            num_chips = num_chips + 1
             print(asic[1], ", ", serial, ", ", testname, ", ", date, ", ", testtime) 
 #            print(datasheet)
 #            print(testtype, testname)
 #            print(convert_to_pdf_command)
 #            os.popen(convert_to_pdf_command)
 
-#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb2", serial, "FNAL", "US", "", "59", "NBMY62.00", "2025-01-10 00:00:00")
-            #dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb2", serial, "LSU", "US", "", "59", "NBMY62.00", "2025-02-27 00:00:00")
-            #dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb2", serial, "BNL", "US", "", "59", "NBMY62.00", "2025-06-04 00:00:00")
-#            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prb2", serial, testname, "No comment", datasheet)
-#            dune_ce_hwdb.EnterFileToTest("coldadc_p2prb2", serial, testname, datasheet, filelist)
+#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "FNAL", "US", "", "59", "NBMY62.00", "2025-01-10 00:00:00")
+#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "LSU", "US", "", "59", "NBMY62.00", "2025-02-27 00:00:00")
+#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "BNL", "US", "", "59", "NBMY62.00", "2025-06-04 00:00:00")
+#            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prb1", serial, testname, "No comment", datasheet)
+            dune_ce_hwdb.EnterFileToTest("coldadc_p2prb1", serial, testname, datasheet, filelist)
+    print(num_chips)
 
 if __name__ == '__main__':
 

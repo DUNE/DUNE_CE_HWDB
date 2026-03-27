@@ -38,19 +38,19 @@ def SubmitWIBQCTest():
         sn = fn.split("/")
         print(fn, sn[len(sn)-1])
         reportfile_name = fn+"/final_report.md"
-        datasheet[1][2] = "\"BNL\""
+        datasheet[1][2] = "BNL"
         with open(reportfile_name) as f:
             for line in f:
                 line_cont = line.strip()
                 line_cont = line_cont.split(":")
                 if line_cont[0] == '#### Tester Name':
                     value = line_cont[1].split(";")
-                    datasheet[1][3] = "\""+value[len(value)-1]+"\""
+                    datasheet[1][3] = value[len(value)-1]
                 elif line_cont[0] == '#### Date':
                     value = line_cont[1].split(";")
                     testdate = value[len(value)-1].split(" ")
-                    datasheet[1][0] = "\""+testdate[0]+"\""
-                    datasheet[1][1] = "\""+testdate[1]+":"+line_cont[2]+"\""
+                    datasheet[1][0] = testdate[0]
+                    datasheet[1][1] = testdate[1]+":"+line_cont[2]
                     
         print(datasheet)
         serial = sn[len(sn)-1]
@@ -64,7 +64,7 @@ def SubmitWIBQCTest():
         filelist = getplotfiles.readlines()
         print(filelist)
 
-        testname = "\"QC Test\""
+        testname = "QC Test"
             
             #print(filelist)
         print(serial)    
