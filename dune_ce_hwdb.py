@@ -51,6 +51,11 @@ locations           =   {
                         }
 inv_locations = {value: key for key, value in locations.items()}
 
+if siteloc not in locations.keys():
+    print("Unrecognized location. Please enter a valid location in the setup_hwdb.sh and initialize it again.")
+    print(locations)
+    exit(1)
+
 parts               =   {
                         "larasic_p5prep1"       : "D08100100001", 
                         "larasic_p5bprep2"      : "D08100100002", 
@@ -214,7 +219,7 @@ def GetItemDetails(item_id):
 
     details = datain.json()["data"]
 
-    if len(detail) == 0:
+    if len(details) == 0:
         return [None, None, None, None, None, None, None, None, None]
 
     #printJSON(details)

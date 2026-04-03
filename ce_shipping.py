@@ -73,7 +73,7 @@ preship_block = []
 subids_block = []
 ship_block = []
 
-preship_upload, ship_upload = False, False
+preship_upload, ship_upload, subpids_upload = False, False, False
 
 def GetItem(item_id):
     
@@ -531,7 +531,7 @@ def Preshipping():
     EnterComponents()
     PreparePreshippingChecklist(ce_shipbox_ID)
     preship_upload = True
-    subpids_upload - True
+    subpids_upload = True
     UploadToHWDB(ce_shipbox_ID)
     return ce_shipbox_ID
 
