@@ -16,8 +16,10 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
     part_name_mapping = {"coldata":"coldata_e4prep", "coldadc":"coldadc_p2prep", "larasic":"larasic_p5prep1"}
 
     components = []
+    specification = []
     for i in range(len(femb_parts)):
-        row = []
+        comp_row = []
+        spec_row = []
         part_type = None
         if "coldata" in femb_parts[i][0].lower():
             part_type = "coldata"
@@ -42,18 +44,26 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
 
         
 
-        #component_id = dune_ce_hwdb.EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, "59")
-        component_id = dune_ce_hwdb.isPartInHWDB(part_type, femb_parts[i][1])
-        row.append(femb_parts[i][0])
-        row.append(femb_parts[i][1])
-        row.append(component_id)
-        components.append(row)
-    dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, "Blah", None, components, components)
-    dune_ce_hwdb.EnterFileToItem("femb_prep", femb_sn, filelist)
+ #       component_id = dune_ce_hwdb.EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, "59")
+ #       component_id = dune_ce_hwdb.isPartInHWDB(part_type, femb_parts[i][1])
+#        spec_row.append(femb_parts[i][0])
+#        spec_row.append(femb_parts[i][1])
+#        specification.append(spec_row)
+        
+#        comp_row.append(femb_parts[i][0])
+#        comp_row.append(component_id)
+#        components.append(comp_row)
+
+#    print(components)
+#    print(specification)
+#    print(filelist)
+#    item_id = dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, None, None, components, specification)
+    item_id = dune_ce_hwdb.isPartInHWDB("femb_prep", femb_sn)
+    dune_ce_hwdb.EnterFileToItem(item_id, filelist)
 
 if __name__ == '__main__':
 
-    femb_num = "00053"
+    femb_num = "00002"
     femb_path = "examples/femb/"
     femb_parts_file = femb_path+"femb_parts_"+femb_num+".txt"
     femb_parts = [[0 for x in range(2)] for y in range(18)]
@@ -75,11 +85,11 @@ if __name__ == '__main__':
                 i = i+1
 
 
-    plotfiles = "ls examples/femb/"+"femb_"+femb_num+"*.png"
+    plotfiles = "ls examples/femb/"+"femb_*"+femb_num+"*.png"
     getplotfiles = os.popen(plotfiles)
     filelist = getplotfiles.readlines()
     print(len(filelist))
     print(filelist)
 
-    SubmitFEMB(femb_parts, femb_sn, "UCINCI", "US", "", "58", filelist)
+    SubmitFEMB(femb_parts, femb_sn, "LSU", "US", "", "58", filelist)
   

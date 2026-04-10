@@ -67,8 +67,8 @@ parts               =   {
                         "coldata_e4prb1"        : "D08100300002", 
                         "coldata_e4prb2"        : "D08100300003", 
                         "femb_prep"             : "D08100400001",
-                        "femb_prod_hd"          : "D08101100031",
-                        "femb_prod_vd"          : "D08101100041",
+                        "fembhd_prod"           : "D08101100031",
+                        "fembvd_prod"           : "D08101100041",
                         "fpga_ptc"              : "D08100800011",
                         "cable_sig_long_vd"     : "D08102100012",
                         "cable_sig_msas_vd"     : "D08102100021",
@@ -173,10 +173,13 @@ def GetComponentID(item_name):
         elif item_name[0:7] == "fembvd_":
             item_part_id = part_id_list[part_name_list.index("fembvd_prod")]
         elif item_name[0:7] == "fembhd_":
-            item_part_id = part_id_list[part_name_list.index("fembhd_prod")]    
+            item_part_id = part_id_list[part_name_list.index("fembhd_prod")]
+        elif item_name == "cable_sig_long_vd":
+            item_part_id = part_id_list[part_name_list.index(item_name)]
         else:
             exit(1)
-    print(item_part_id)
+
+
     return item_part_id
 
 def GetSummary(item_name, location = None):
@@ -461,6 +464,8 @@ def isPartIDInHWDB(part_id):
     datain = requests.get(url, headers=headers)
     parts = datain.json()
 
+    if commverb == 'VERB1': printJSON(parts)
+
     if parts["status"] == "ERROR":
         return False
     else:
@@ -544,13 +549,15 @@ def EnterItemToHWDB(item_name, item_sn, institution, country_code = "US", commen
         upload = requests.post(url, json=item_data, headers=headers)
         upload_result = upload.json()
 
+        if commverb == 'VERB1': printJSON(upload_result)
+
         if upload_result["status"] == "OK":
             item_id = upload_result["part_id"]
             print("Item ",item_name," entry has been created with item ID: ", item_id)
         else:
             print("Item entry for ",item_name, " failed.")
             exit(1)
-
+    
     UpdateLocation(item_id, institution, comments, arrival_date) 
     
     return item_id
@@ -579,21 +586,24 @@ def ItemToUploadJSON(item_sn, part_type_id, institution, country_code = "US", co
     else:
         item_data["manufacturer"] = None
 
-    item_data["specifications"] = {}
+#    lot_spec = {}
+#    spec_sheet = {}
     item_spec = {}
     if specification != None:
         for i in range(len(specification)):
             item_spec[specification[i][0]] = specification[i][1]
     if lot_num != None:
         item_spec["LOT N"] = lot_num        
-    if len(item_spec) > 0:        
-        item_data["specifications"] = item_spec
+
+    item_data["specifications"] = {}
+    item_data["specifications"]["DATA"] = item_spec
+
     
     if connectors != None:
         item_data["subcomponents"] = {}
         item_subc = {}
         for i in range(len(connectors)):
-            item_subc[connectors[i][0]] = connectors[i][2]
+            item_subc[connectors[i][0]] = connectors[i][1]
         item_data["subcomponents"] = item_subc    
 
     return item_data
@@ -873,16 +883,19 @@ def GetItemFilesInHWDB(item_id):
     datain = requests.get(url, headers=headers)
     images = datain.json()["data"]
 
+    if commverb == 'VERB1': printJSON(images)
+
     image_list = []
     for image in images:
         image_list.append(image["image_name"])
 
-    return images_list
+    if commverb == 'VERB1': print(image_list)
+
+    return image_list
 
 def EnterFileToItem(item_id, filelist = None):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
 
-#    item_id = isPartInHWDB(item_name, item_sn)
     if not isPartIDInHWDB(item_id):
         print("The item ", item_id, " is not in the database")
         return None
@@ -910,8 +923,10 @@ def EnterFileToItem(item_id, filelist = None):
 #                    else:
                     files = {'image':(filename, fp, mime_type)}
                     upload = requests.post(url, files=files, headers=headers)
-                    file_ids.append((upload.json())["image_id"])
 
+                    file_ids.append((upload.json())["image_id"])
+        
+    if commverb == 'VERB1': print(file_ids)
     return file_ids
 
 def GetTestFilesInHWDB(test_id):
