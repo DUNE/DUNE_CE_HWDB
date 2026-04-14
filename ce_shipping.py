@@ -75,6 +75,13 @@ ship_block = []
 
 preship_upload, ship_upload, subpids_upload = False, False, False
 
+def itemID(prompt):
+    id_val = input(prompt)
+    scanned = id_val.strip()
+    item = scanned.split("/")
+    value = (item[len(item)-1])[0:18]
+    return value
+
 def GetItem(item_id):
     
     token = None
@@ -224,10 +231,11 @@ def EnterComponents():
 
     subcom_loop = True
     while(subcom_loop):
-        subcom_val = input("Please enter subcomponents or enter D for done: ")
-        subcom = subcom_val.strip()
-        subcom = subcom.split("/")
-        subcom_ID = subcom[len(subcom)-1]
+#        subcom_val = input("Please enter subcomponents or enter D for done: ")
+#        subcom = subcom_val.strip()
+#        subcom = subcom.split("/")
+#        subcom_ID = subcom[len(subcom)-1]
+        subcom_ID = itemID("Please enter subcomponents or enter D for done: ")
         if subcom_ID != "D":
             if subcom_ID in subcomponents:
                 print("Item with ID ", subcom_ID, " is already on the list.")
@@ -500,12 +508,11 @@ def Preshipping():
         elif val == "N":
             id_loop = True
             while(id_loop):
-                id_val = input("Scan or enter CE Shipping Box ID: ") 
-                
-                scanned = id_val.strip()
-                item = scanned.split("/")
-                ce_shipbox_ID = item[len(item)-1]
-
+#                id_val = input("Scan or enter CE Shipping Box ID: ")                 
+#                scanned = id_val.strip()
+#                item = scanned.split("/")
+#                ce_shipbox_ID = item[len(item)-1]
+                ce_shipbox_ID = itemID("Scan or enter CE Shipping Box ID: ")
                 if dune_ce_hwdb.isPartIDInHWDB(ce_shipbox_ID):
                     item_name = dune_ce_hwdb.GetItemName(ce_shipbox_ID)
                     item_loc = dune_ce_hwdb.GetItemLocation(ce_shipbox_ID)
@@ -619,7 +626,7 @@ def Receiving():
         id_val = input("Scan or enter CE Shipping Box ID: ")
         scanned = id_val.strip()
         item = scanned.split("/")
-        ce_shipbox_ID = item[len(item)-1]
+        ce_shipbox_ID = (item[len(item)-1])[1:21]
 
         item_data = GetItem(ce_shipbox_ID)
         data = (item_data.json())

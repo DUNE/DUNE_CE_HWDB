@@ -106,6 +106,13 @@ part_id_list        = list(parts.values())
 status_names        = list(part_status.keys())
 status_ids          = list(part_status.values())
 
+print(siteloc)
+
+if siteloc not in loc_name_list:
+    print("Unrecognized location. Please enter a valid location in the setup_hwdb.sh and initialize it again.")
+    print(locations)
+    exit(1)
+
 #class DUNECE_HWDB:
 
 

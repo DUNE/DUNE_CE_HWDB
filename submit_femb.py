@@ -58,8 +58,8 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
 #    print(specification)
 #    print(filelist)
 #    item_id = dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, None, None, components, specification)
-    item_id = dune_ce_hwdb.isPartInHWDB("femb_prep", femb_sn)
-    dune_ce_hwdb.EnterFileToItem(item_id, filelist)
+#    item_id = dune_ce_hwdb.isPartInHWDB("femb_prep", femb_sn)
+#    dune_ce_hwdb.EnterFileToItem(item_id, filelist)
 
 if __name__ == '__main__':
 
