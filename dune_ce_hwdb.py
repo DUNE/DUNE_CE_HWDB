@@ -183,6 +183,8 @@ def GetComponentID(item_name):
             item_part_id = part_id_list[part_name_list.index("fembhd_prod")]
         elif item_name == "cable_sig_long_vd":
             item_part_id = part_id_list[part_name_list.index(item_name)]
+        elif item_name == "cable_sig_msas_vd":
+            item_part_id = part_id_list[part_name_list.index(item_name)]
         else:
             exit(1)
 
