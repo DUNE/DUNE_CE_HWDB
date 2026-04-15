@@ -31,17 +31,6 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
         if part_type is None:
             raise ValueError(f"Unknown part type for {femb_parts[i][0]}")
         part_type = part_name_mapping[part_type]
-    components = []
-    for i in range(len(femb_parts)):
-        row = []
-        part_type = None
-        if "coldata" in femb_parts[i][0].lower():
-            part_type = "coldata"
-        elif "coldadc" in femb_parts[i][0].lower():
-            part_type = "coldadc"
-        elif "larasic" in femb_parts[i][0].lower():
-            part_type = "larasic"
-
         
 #### Next submits the chips to the HWDB
         component_id = dune_ce_hwdb.EnterItemToHWDB(part_type, femb_parts[i][1], institution, country_code, comments, "59")
@@ -55,12 +44,12 @@ def SubmitFEMB(femb_parts, femb_sn, institution, country_code = "US", comments =
         comp_row.append(component_id)
         components.append(comp_row)
 
-#    print(components)
-#    print(specification)
+    print(components)
+    print(specification)
 #    print(filelist)
-    item_id = dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, None, None, components, specification)
-    item_id = dune_ce_hwdb.isPartInHWDB("femb_prep", femb_sn)
-    dune_ce_hwdb.EnterFileToItem(item_id, filelist)
+#    item_id = dune_ce_hwdb.EnterItemToHWDB("femb_prep", femb_sn, institution, country_code, comments, manufact_id, None, None, components, specification)
+#    item_id = dune_ce_hwdb.isPartInHWDB("femb_prep", femb_sn)
+#    dune_ce_hwdb.EnterFileToItem(item_id, filelist)
 
 if __name__ == '__main__':
 
