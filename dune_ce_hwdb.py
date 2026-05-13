@@ -463,7 +463,7 @@ def isPartInHWDB(item_name, item_sn):
     parts = datain.json()["data"]
     if len(parts) == 0:
         return None
-    elif len(parts) == 1:
+    else:
         return (parts[0])["part_id"]
 
 def isPartIDInHWDB(part_id):
