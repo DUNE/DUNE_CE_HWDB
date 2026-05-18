@@ -106,12 +106,16 @@ part_id_list        = list(parts.values())
 status_names        = list(part_status.keys())
 status_ids          = list(part_status.values())
 
-print(siteloc)
-
 if siteloc not in loc_name_list:
     print("Unrecognized location. Please enter a valid location in the setup_hwdb.sh and initialize it again.")
     print(locations)
     exit(1)
+
+print("The current selected site is: "+siteloc)
+conf_site=input("Please confirm the site by entering 'Y' or change it in setup_hwdb.sh: ")
+if conf_site != "Y":
+    exit(1)
+
 
 #class DUNECE_HWDB:
 
@@ -513,7 +517,7 @@ def GetTestTypeID(item_name, test_type = None):
         exit(1)
         return None, None
 
-def isTestInHWDB(item_id, qc_tid, qc_date, qc_time):
+def isTestInHWDB(item_id, qc_type, qc_date, qc_time):
     global curl_command, upload_url, download_url
 
     found_test = False
@@ -521,18 +525,20 @@ def isTestInHWDB(item_id, qc_tid, qc_date, qc_time):
 
     test_time = None 
     test_date = None
+    test_type = None
     
     testsIDsList, testsTypesList, testsFieldsList, testsValuesList, testsImagesList = GetItemTests(item_id)
-
+    
     if commverb == 'VERB1': print(qc_date, qc_time)
     if testsIDsList != None:
         for i in range(len(testsIDsList)):
             test_date   = testsValuesList[i][testsFieldsList[i].index("Test Date")]
             test_time   = testsValuesList[i][testsFieldsList[i].index("Test Time")]
+            test_type   = testsTypesList[i]
             test_num    = testsIDsList[i]
 
             if commverb == 'VERB1': print(test_date, test_time ,test_num)
-            if (test_date == qc_date) and (test_time == qc_time):
+            if (test_date == qc_date) and (test_time == qc_time) and (test_type == qc_type):
                 found_test = True
                 found_test_id = test_num
 
@@ -700,7 +706,7 @@ def EnterTestToHWDB(item_name, item_sn, test_type = None, comment = "No comment"
         print("The item ", item_name, "with SN", item_sn, " is not in the database")
         return None 
 
-    checkTest = isTestInHWDB(item_id, qc_tid, qc_date, qc_time)
+    checkTest = isTestInHWDB(item_id, qc_type, qc_date, qc_time)
     if checkTest != None:
         print("This test is already in the database")
         print("Test ID = ", checkTest)
@@ -773,7 +779,7 @@ def PatchItem(item_id, item_status = None, cert_qc = None, is_installed = None, 
         print("Item doesn't exist for PATCHing!")
         return None
     else:
-        patch_data, patch_subcomp = ItemToPatchJSON(item_id, item_status_id, cert_qc, is_installed, qc_uploaded, item_newsn, lot_num, connectors, specification)
+        patch_data, patch_subcomp = ItemToPatchJSON(item_id, item_status_id, cert_qc, is_installed, qc_uploaded, item_newsn, manufact_id, lot_num, connectors, specification)
 
         if commverb == 'VERB1': printJSON(patch_data)
 
@@ -812,15 +818,26 @@ def ItemToPatchJSON(item_id, item_status_id = None, cert_qc = None, is_installed
         manuf_patch["id"] = manufact_id
         item_patch["manufacturer"] = manuf_patch
 
-    if specification != None or lot_num != None:
-        item_spec = {}
-        if specification != None:
-            for i in range(len(specification)):
-                item_spec[specification[i][0]] = specification[i][1]
-        if lot_num != None:
-            item_spec["LOT N"] = lot_num
-        if len(item_spec) > 0:
-            item_spec["specifications"] = item_spec
+    item_spec = {}
+    if specification != None:
+        for i in range(len(specification)):
+            item_spec[specification[i][0]] = specification[i][1]
+    if lot_num != None:
+        item_spec["LOT N"] = lot_num
+
+    item_patch["specifications"] = {}
+    item_patch["specifications"]["DATA"] = item_spec
+
+
+#    if specification != None or lot_num != None:
+#        item_spec = {}
+#        if specification != None:
+#            for i in range(len(specification)):
+#                item_spec[specification[i][0]] = specification[i][1]
+#        if lot_num != None:
+#            item_spec["LOT N"] = lot_num
+#        if len(item_spec) > 0:
+#            item_spec["specifications"] = item_spec
 
     subcomp_patch = {}
     if connectors != None:
@@ -972,7 +989,7 @@ def EnterFileToTest(item_name, item_sn, test_type, test_datasheet = None, fileli
         print("The item ", item_name, "with SN", item_sn," is not in the database")
         return None
 
-    test_id = isTestInHWDB(item_id, qc_tid, qc_date, qc_time)
+    test_id = isTestInHWDB(item_id, qc_type, qc_date, qc_time)
     if test_id == None:
         print("The ", test_type, qc_date, qc_time, " test for ", item_name, "with SN", item_sn," is not in the database")
         return None
