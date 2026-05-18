@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
 
     with open("parts_list_"+partName+".csv", "w") as fcsv:
-        for part in part_list:
-
+        for i in range(0, len(part_list)):
+            part = part_list[i]
             item_id = part.strip()
             item_id = item_id.strip("\"")
             values = dune_ce_hwdb.GetItemDetails(item_id)
