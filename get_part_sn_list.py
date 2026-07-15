@@ -21,7 +21,7 @@ if __name__ == '__main__':
             item_id = part.strip()
             item_id = item_id.strip("\"")
             part_sn   =  dune_ce_hwdb.GetItemSN(item_id)
-            print(part_sn+", "+item_id)
+            print(part_sn,item_id)
 
             fcsv.write(part_sn+", "+item_id)
 

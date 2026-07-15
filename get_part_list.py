@@ -17,7 +17,7 @@ if __name__ == '__main__':
             partSN = sys.argv[2]
             part_list.append(dune_ce_hwdb.isPartInHWDB(partName, partSN))
         else:
-            print(partName)
+#            print(partName)
             part_list = dune_ce_hwdb.GetPartList(partName)
             if len(part_list) == 0:
                 print("No parts recorded in the HWDB.")

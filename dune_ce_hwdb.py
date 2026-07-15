@@ -19,8 +19,19 @@ commverb=os.environ.get('COMMANDVERB')
 siteloc=os.environ.get('SITELOC')
 
 token = None
-with open(tokenloc, 'r') as ft:
-    token = ft.read().strip()
+
+try:
+    with open(tokenloc, 'r') as ft:
+        token = ft.read().strip()
+except FileNotFoundError:
+    print(f"Error: The file '{tokenloc}' does not exist.")
+except PermissionError:
+    print(f"Error: You do not have permission to access '{tokenloc}'.")
+except IsADirectoryError:
+    print(f"Error: '{tokenloc}' is a directory, not a file.")
+except OSError as e:
+    print(f"A general system/disk error occurred: {e}")
+
 headers = {'Authorization': f'Bearer {token}'}
 
 
@@ -144,6 +155,101 @@ if conf_site != "Y":
 #
 #        self.soft_dir = os.environ["PWD"]
 
+def PostToHWDB(url, data = None, file = None):
+
+    result = None
+    fileID = None
+    if file != None:
+        filename = Path(file).name
+        mime_type, encoding = mimetypes.guess_type(file)
+
+        with open(file, 'rb') as fp:
+            if data !=None:
+                files = {
+                    **{key: (None, value) for key, value in data.items()},
+                    'image':(filename, fp, mime_type)}
+            else:
+                files = {
+                     'image':(filename, fp, mime_type)}
+            try:
+                upload = requests.post(url, files=files, headers=headers)
+                upload.raise_for_status()
+
+                result = upload.json()
+                fileID = result["image_id"]
+
+            except requests.exceptions.HTTPError as http_err:
+                print(f"HTTP error occurred (e.g., 404, 500): {http_err}")
+
+            except requests.exceptions.ConnectionError as conn_err:
+                print(f"Connection error occurred (e.g., DNS failure, refused port): {conn_err}")
+
+            except requests.exceptions.Timeout as timeout_err:
+                print(f"The request timed out: {timeout_err}")
+
+            except requests.exceptions.RequestException as req_err:
+                print(f"An ambiguous Requests exception occurred: {req_err}")
+
+            except Exception as e:
+                print(f"A non-Requests error occurred (e.g., JSON parsing failed): {e}")
+
+    elif data != None:
+        try:
+            upload = requests.post(url, json=data, headers=headers)
+            upload.raise_for_status()
+
+            result = upload.json()
+            if commverb == 'VERB1': printJSON(result)
+
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred (e.g., 404, 500): {http_err}")
+
+        except requests.exceptions.ConnectionError as conn_err:
+            print(f"Connection error occurred (e.g., DNS failure, refused port): {conn_err}")
+
+        except requests.exceptions.Timeout as timeout_err:
+            print(f"The request timed out: {timeout_err}")
+
+        except requests.exceptions.RequestException as req_err:
+            print(f"An ambiguous Requests exception occurred: {req_err}")
+    
+        except Exception as e:
+            print(f"A non-Requests error occurred (e.g., JSON parsing failed): {e}")
+
+    return result, fileID
+
+def GetFromHWDB(url, filename = None):
+
+    if commverb == 'VERB1': printJSON(url)
+    result = None
+    try:
+        download = requests.get(url, headers=headers)
+        download.raise_for_status()
+
+        if filename == None:
+            result = download.json()
+            if commverb == 'VERB1': printJSON(result)
+        else:
+            if download.status_code == 200:
+                with open(filename, 'wb') as f:
+                    f.write(download.content)
+                    print(f"File '{filename}' downloaded successfully!")
+            else:
+                print(f"Failed to download file. Status code: {download.status_code}")
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred (e.g., 404, 500): {http_err}")
+    except requests.exceptions.ConnectionError as conn_err:
+        print(f"Connection error occurred (e.g., DNS failure, refused port): {conn_err}")
+    except requests.exceptions.Timeout as timeout_err:
+        print(f"The request timed out: {timeout_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"An ambiguous Requests exception occurred: {req_err}")
+    except Exception as e:
+        print(f"A non-Requests error occurred (e.g., JSON parsing failed): {e}")
+
+    return result
+
 def checkTimeFormat(date_time):
     date_time_format = "%Y-%m-%d %H:%M:%S"
     try:
@@ -207,15 +313,12 @@ def GetSummary(item_name, location = None):
             print("Location is not recognized. Accepted locations are:")
             print(loc_name_list)
             exit(1)
-
         url = download_url + "/component-types/" + item_part_id + "/components?location=" + str(institution_id)
-        print(url)
     else:
         url = download_url + "/component-types/" + item_part_id + "/components?"
 
-    datain = requests.get(url, headers=headers)
-    summary  = datain.json()["pagination"]
-    printJSON(summary)
+    datain = GetFromHWDB(url, filename = None)
+    summary  = datain["pagination"]
     
     if summary["total"] == 0:
         return None
@@ -231,14 +334,12 @@ def GetItemDetails(item_id):
         return
 
     url = download_url + "/components/" + item_id
-    datain = requests.get(url, headers=headers)
+    datain = GetFromHWDB(url, filename = None)
 
-    details = datain.json()["data"]
+    details = datain["data"]
 
     if len(details) == 0:
         return [None, None, None, None, None, None, None, None, None]
-
-    #printJSON(details)
 
     comp_name       = details['component_type']['name']
     serial          = details['serial_number']
@@ -276,14 +377,8 @@ def GetQRCode(item_id):
 
     file_name = "QR_"+item_id+".png"
     url = download_url + "/get-qrcode/" + item_id 
-    datain = requests.get(url, headers=headers)
-
-    if datain.status_code == 200:
-        with open(file_name, 'wb') as f:
-            f.write(datain.content)
-        print(f"File '{file_name}' downloaded successfully!")
-    else:
-        print(f"Failed to download file. Status code: {response.status_code}")
+    
+    datain = GetFromHWDB(url, file_name)
 
 def GetBarCode(item_id):
     global curl_command, upload_url, download_url, upload_command
@@ -297,12 +392,7 @@ def GetBarCode(item_id):
     url = download_url + "/get-barcode/" + item_id
     datain = requests.get(url, headers=headers)
 
-    if datain.status_code == 200:
-        with open(file_name, 'wb') as f:
-            f.write(datain.content)
-        print(f"File '{file_name}' downloaded successfully!")
-    else:
-        print(f"Failed to download file. Status code: {response.status_code}")
+    datain = GetFromHWDB(url, file_name)
 
 def GetItemName(item_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list
@@ -325,16 +415,16 @@ def GetItemStatus(item_id):
         return
 
     url = download_url + "/components/" + item_id + "/status"
-    datain = requests.get(url, headers=headers)
-    status = datain.json()['data']
+    datain = GetFromHWDB(url, filename = None)
+    status = datain['data']
     return status['status']['name'], status['status']['id'], status['certified_qaqc'], status['is_installed'], status['qaqc_uploaded']
-
+        
 def GetItemTests(item_id):
     global curl_command, upload_url, download_url
 
     url = download_url + "/components/" + item_id + "/tests"
-    datain = requests.get(url, headers=headers)
-    test_types = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    test_types = datain["data"]
     test_type_ids = []
     test_type_names = []
     if len(test_types) > 0:
@@ -351,8 +441,8 @@ def GetItemTests(item_id):
     testsImagesList = [] 
     for test_tid in test_type_ids:
         url = download_url + "/components/"+item_id+"/tests/"+str(test_tid)+"?history=True"
-        testsin = requests.get(url, headers=headers)
-        tests = testsin.json()["data"]
+        testsin = GetFromHWDB(url, filename = None)
+        tests = testsin["data"]
         #printJSON(tests)
         for test in tests:
             testsIDsList.append(test["id"])
@@ -370,8 +460,8 @@ def GetParent(item_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list
 
     url = download_url + "/components/" + item_id + "/container"
-    datain = requests.get(url, headers=headers)
-    cont = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    cont = datain["data"]
     if len(cont) > 0:
         parent_id = (cont[0])["container"]["part_id"]
         return parent_id
@@ -385,14 +475,13 @@ def GetPartList(item_name):
 
     numItems = GetSummary(item_name)
     numPages = int(numItems)//100 + 1
-    print (numItems, numPages)
 
     partsList = []
     for i in range(numPages):
         page = str(i+1)
         url = download_url + "/component-types/" + item_part_id + "/components?page=" + page + "&size=100"
-        datain = requests.get(url, headers=headers)
-        plist = datain.json()["data"]
+        datain = GetFromHWDB(url, filename = None)
+        plist = datain["data"]
         for part in plist:
             partsList.append(part["part_id"])
     return partsList
@@ -401,8 +490,8 @@ def GetSubcomponents(item_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list
 
     url = download_url + "/components/" + item_id + "/subcomponents"
-    subcomp = requests.get(url, headers=headers)
-    subcomponents       = subcomp.json()["data"]
+    subcomp = GetFromHWDB(url, filename = None)
+    subcomponents       = subcomp["data"]
     subcomponent_pids   = []
     subcomponent_fpos   = []
     if len(subcomponents) != 0:
@@ -423,8 +512,8 @@ def GetSystemName(item_id):
     hwdb_com_id = item_id[0:12]
 
     url = download_url + "/systems/" + hwdb_exp_id + "/" + hwdb_sys_id
-    datain = requests.get(url, headers=headers)
-    sys = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    sys = datain["data"]
     if len(sys) > 0:
         return sys['name']
     else:
@@ -439,8 +528,8 @@ def GetSubsystemName(item_id):
     hwdb_com_id = item_id[0:12]
 
     url = download_url + "/subsystems/" + hwdb_exp_id + "/" + hwdb_sys_id + "/" + hwdb_sub_id
-    datain = requests.get(url, headers=headers)
-    sys = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    sys = datain["data"]
     if len(sys) > 0:
         return sys['subsystem_name']
     else:
@@ -450,8 +539,8 @@ def GetComponentName(item_id):
     global curl_command, upload_url, download_url, upload_command
 
     url = download_url + "/components/" + item_id
-    datain = requests.get(url, headers=headers)
-    comp = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    comp = datain["data"]
     if len(comp) > 0:
         return comp['component_type']['name']
     else:
@@ -463,21 +552,22 @@ def isPartInHWDB(item_name, item_sn):
     item_part_id = GetComponentID(item_name)
 
     url = download_url + "/component-types/" + item_part_id + "/components?serial_number="+item_sn
-    datain = requests.get(url, headers=headers)
-    parts = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+
+    parts = datain["data"]
     if len(parts) == 0:
         return None
     else:
-        return (parts[0])["part_id"]
+        item_id = (parts[0])["part_id"]
+        print(f"{item_name} with SN {item_sn} has item ID: {item_id}")
+        return item_id
 
 def isPartIDInHWDB(part_id):
     global curl_command, upload_url, download_url, upload_command
 
     url = download_url + "/components/" + part_id
-    datain = requests.get(url, headers=headers)
-    parts = datain.json()
-
-    if commverb == 'VERB1': printJSON(parts)
+    
+    parts = GetFromHWDB(url, filename = None)
 
     if parts["status"] == "ERROR":
         return False
@@ -495,8 +585,8 @@ def GetTestTypeID(item_name, test_type = None):
     item_part_id = GetComponentID(item_name)
 
     url = download_url + "/component-types/" + item_part_id + "/test-types"
-    datain = requests.get(url, headers=headers)
-    test_types = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    test_types = datain["data"]
 
     qc_names    = []
     qc_tids     = []
@@ -561,10 +651,7 @@ def EnterItemToHWDB(item_name, item_sn, institution, country_code = "US", commen
         if commverb == 'VERB1': printJSON(item_data)
 
         url = download_url + "/component-types/" + item_part_id + "/components"
-        upload = requests.post(url, json=item_data, headers=headers)
-        upload_result = upload.json()
-
-        if commverb == 'VERB1': printJSON(upload_result)
+        upload_result, dummy = PostToHWDB(url, item_data, None)
 
         if upload_result["status"] == "OK":
             item_id = upload_result["part_id"]
@@ -628,8 +715,8 @@ def GetCurrentLocation(item_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
 
     url = download_url + "/components/" + item_id + "/locations"
-    datain = requests.get(url, headers=headers)
-    loc_data = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    loc_data = datain["data"]
 
     if len(loc_data) == 0:
         return None, None
@@ -671,8 +758,10 @@ def UpdateLocation(item_id, institution = siteloc, comments = "", arrival_date =
         print(json.dumps(loc_data, indent = 4))
 
         url = download_url + "/components/" + item_id + "/locations"
-        update_loc = requests.post(url, json=loc_data, headers=headers)
-        if update_loc.json()["status"] == "OK":
+#        update_loc = requests.post(url, json=loc_data, headers=headers)
+        update_loc, dummy = PostToHWDB(url, loc_data, None)     
+        
+        if update_loc["status"] == "OK":
             print("Location has been successfully updated to ", institution)
         else:
             print("Location update has failed.")
@@ -718,10 +807,7 @@ def EnterTestToHWDB(item_name, item_sn, test_type = None, comment = "No comment"
     url = download_url + "/components/" + item_id + "/tests"
     print(url)
 
-    upload_test = requests.post(url, json=item_test, headers=headers)
-    print(upload_test)
-    upload_result = upload_test.json()
-    printJSON(upload_result)
+    upload_result, dummy = PostToHWDB(url, item_test, None)
     
     if upload_result["status"] == "OK":
         return upload_result["test_id"]
@@ -857,8 +943,8 @@ def GetComponentFilesInHWDB(item_par_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
 
     url = download_url + "/component-types/" + item_part_id +"/images"
-    datain = requests.get(url, headers=headers)
-    images = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    images = datain["data"]
 
     image_list = []
     for image in images:
@@ -876,25 +962,15 @@ def EnterFileToType(item_name, filelist = None):
         print("File list is empty. Please provide at least one file to upload.")
         return None
     else:
+        url = download_url + "/component-types/" + item_id +"/images"
         images_list = GetComponentFilesInHWDB(item_part_id)
         for file in filelist:
             filetoupload = file.strip()
             filename = Path(filetoupload).name
             if (len(images_list) == 0) or ((len(images_list) != 0) and not(filename in images_list)):
-                url = download_url + "/component-types/" + item_id +"/images"
-#                print(file, type(filename))
-                mime_type, encoding = mimetypes.guess_type(filetoupload)
-#                print(mime_type)
 
-                with open(filetoupload, 'rb') as fp:
-#                    if data !=None:
-#                        files = {
-#                            **{key: (None, value) for key, value in data.items()},
-#                            'image':(filename, fp, mime_type)}
-#                    else:
-                    files = {'image':(filename, fp, mime_type)}
-                    upload = requests.post(url, files=files, headers=headers)
-                    file_ids.append((upload.json())["image_id"])
+                dummy, fileID = PostToHWDB(url, None, filetoupload)
+                file_ids.append(fileID)
 
     return file_ids
 
@@ -906,10 +982,8 @@ def GetItemFilesInHWDB(item_id):
         return None
 
     url = download_url + "/components/" + item_id +"/images"
-    datain = requests.get(url, headers=headers)
-    images = datain.json()["data"]
-
-    if commverb == 'VERB1': printJSON(images)
+    datain = GetFromHWDB(url, filename = None)
+    images = datain["data"]
 
     image_list = []
     for image in images:
@@ -931,36 +1005,24 @@ def EnterFileToItem(item_id, filelist = None):
         print("File list is empty. Please provide at least one file to upload.")
         return None
     else:
+        url = download_url + "/components/" + item_id +"/images"
         images_list = GetItemFilesInHWDB(item_id)
         for file in filelist:
             filetoupload = file.strip()
             filename = Path(filetoupload).name
             if (len(images_list) == 0) or ((len(images_list) != 0) and not(filename in images_list)):
-                url = download_url + "/components/" + item_id +"/images"
-#                print(file, type(filename))
-                mime_type, encoding = mimetypes.guess_type(filetoupload)
-#                print(mime_type)
-
-                with open(filetoupload, 'rb') as fp:
-#                    if data !=None:
-#                        files = {
-#                            **{key: (None, value) for key, value in data.items()},
-#                            'image':(filename, fp, mime_type)}
-#                    else:
-                    files = {'image':(filename, fp, mime_type)}
-                    upload = requests.post(url, files=files, headers=headers)
-
-                    file_ids.append((upload.json())["image_id"])
+ 
+                dummy, fileID = PostToHWDB(url, None, filetoupload)
+                file_ids.append(fileID)
         
-    if commverb == 'VERB1': print(file_ids)
     return file_ids
 
 def GetTestFilesInHWDB(test_id):
     global curl_command, upload_url, download_url, upload_command, loc_name_list, loc_id_list, part_name_list, part_id_list
 
     url = download_url + "/component-tests/" + str(test_id) +"/images"
-    datain = requests.get(url, headers=headers)
-    images = datain.json()["data"]
+    datain = GetFromHWDB(url, filename = None)
+    images = datain["data"]
 
     image_list = []
     for image in images:
@@ -1000,24 +1062,14 @@ def EnterFileToTest(item_name, item_sn, test_type, test_datasheet = None, fileli
         return None
     else:
         images_list = GetTestFilesInHWDB(test_id)
+        url = download_url + "/component-tests/" + str(test_id) +"/images"
         for file in filelist:
             filetoupload = file.strip() 
             filename = Path(filetoupload).name
             if (len(images_list) == 0) or ((len(images_list) != 0) and not(filename in images_list)):
-                url = download_url + "/component-tests/" + str(test_id) +"/images"
-#                print(file, type(filename))
-                mime_type, encoding = mimetypes.guess_type(filetoupload)
-#                print(mime_type)
 
-                with open(filetoupload, 'rb') as fp:
-#                    if data !=None:
-#                        files = {
-#                            **{key: (None, value) for key, value in data.items()},
-#                            'image':(filename, fp, mime_type)}
-#                    else:
-                    files = {'image':(filename, fp, mime_type)}
-                    upload = requests.post(url, files=files, headers=headers)
-                    file_ids.append((upload.json())["image_id"])
+                dummy, fileID = PostToHWDB(url, None, filetoupload) 
+                file_ids.append(fileID)
     return file_ids
 
 #if __name__ == '__main__':
