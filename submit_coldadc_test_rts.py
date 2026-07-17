@@ -26,12 +26,6 @@ def SubmitColdADCCTSQCTest():
         "Overall QC Result"
     ]
 
-#    datasheet = [["" for _ in range(10)] for _ in range(2)]
-
-#    for i in range(len(tests)):
-#        datasheet[0][i] = tests[i]
-
-
     getnames = os.popen("ls -d /mnt/f/coldadc_qc_results/DUNE_CE/TestData/Time*")
     test_folders = getnames.readlines()
     folders_list = []
@@ -47,10 +41,9 @@ def SubmitColdADCCTSQCTest():
             folders_list.append(res_folder)
 
     for folder in folders_list:
-        #print(folder)
         getchips = os.popen(f"ls -d {folder}/*/")
         chipfolders = getchips.readlines()
-#        binfiles = numbinfiles[0].strip()
+
         file_list = []
         for chipfolder in chipfolders:
             chip = (chipfolder.strip()).split("/")
