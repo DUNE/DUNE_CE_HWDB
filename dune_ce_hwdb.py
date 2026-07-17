@@ -1,4 +1,3 @@
-import datetime
 import socket
 import os
 import os.path
@@ -12,11 +11,16 @@ import requests
 import mimetypes
 from pathlib import Path
 from reportlab.pdfgen import canvas
+from datetime import datetime, date, time, timezone
 
 tokenloc=os.environ.get('TOKENLOC')
 hwdbsel=os.environ.get('HWDBSELECT')
 commverb=os.environ.get('COMMANDVERB')
 siteloc=os.environ.get('SITELOC')
+
+if tokenloc == None:
+    print("Token file is not set. Please obtain a token by sourcing setup_hwdb.sh and then check if the token full path matches.")
+    exit(1)
 
 token = None
 
@@ -122,8 +126,8 @@ if siteloc not in loc_name_list:
     print(locations)
     exit(1)
 
-print("The current selected site is: "+siteloc)
-conf_site=input("Please confirm the site by entering 'Y' or change it in setup_hwdb.sh: ")
+print(f"The current selected site is \033[35m{siteloc}\033[0m and your system's timezone is \033[35m{datetime.now().astimezone().tzinfo}\033[0m")
+conf_site=input("Please confirm the site and timezone by entering 'Y' or change it in setup_hwdb.sh: ")
 if conf_site != "Y":
     exit(1)
 
@@ -253,10 +257,23 @@ def GetFromHWDB(url, filename = None):
 def checkTimeFormat(date_time):
     date_time_format = "%Y-%m-%d %H:%M:%S"
     try:
-        datetime.datetime.strptime(date_time, date_time_format)
+        datetime.strptime(date_time, date_time_format)
         return True
     except ValueError:
         return False
+
+def GetUTC(date, time):
+    if len(time) == 5:
+        dt_string = date +" "+ time+":00"
+    elif len(time) == 8:
+        dt_string = date +" "+ time
+    print(dt_string) 
+    if checkTimeFormat(dt_string):
+        dt = datetime.strptime(dt_string, "%Y-%m-%d %H:%M:%S")
+        utc_dt = dt.replace(tzinfo=timezone.utc)
+        return int(utc_dt.timestamp())
+    else:
+        return None
 
 def ConvertToJSON(data):
     json_data = ""
@@ -818,14 +835,47 @@ def EnterTestToHWDB(item_name, item_sn, test_type = None, comment = "No comment"
 
 def TestToUploadJSON(test_type, comment = "No comment", test_datasheet = None):
 
+    item_test_data = None
+    if type(test_datasheet) is dict: 
+        item_test_data = test_datasheet       
+    elif type(test_datasheet) is list:
+        if len(test_datasheet) == 2:
+            new_data = [list(row) for row in zip(*test_datasheet)]
+            item_test_data = dict(new_data)
+        elif len(test_datasheet) > 3:
+            item_test_data = dict(test_datasheet)
+        else:
+            print("The test_datasheet is a list but it is not in the from the type 2xn or nx2, where n>3")
+            exit(1)
+    else:
+        print("The type of the test_datasheet is not used.")
+        print("The acceptable types are a dict with param:value or a list with 2xn or nx2.")
+        exit(1)
+    
+    if type(item_test_data) is dict:
+        if "/" in item_test_data['Test Date']:
+            item_test_data['Test Date'] = item_test_data['Test Date'].replace("/", "-")
+        elif "-" not in item_test_data['Test Date']:
+            print("Print test date doesn't have the accpted format.")
+            exit(1)
+
+        test_date = item_test_data['Test Date']    
+        test_time = item_test_data['Test Time']
+        utc_tmstmp = GetUTC(test_date, test_time)
+        item_test_data.update({"UTC timestamp": utc_tmstmp})
+    else:
+        print("Something went wrong with test data parsing.")
+        exit(1)
+
+
     item_test = {}
     item_test["test_type"] = test_type
     item_test["comments"] = comment
     
-    item_test_data = {}
-    num_data = len(test_datasheet[0])
-    for i in range(num_data):
-        item_test_data[test_datasheet[0][i]] = test_datasheet[1][i]
+#    item_test_data = {}
+#    num_data = len(test_datasheet[0])
+#    for i in range(num_data):
+#        item_test_data[test_datasheet[0][i]] = test_datasheet[1][i]
     item_test["test_data"] = item_test_data    
 
     return item_test
