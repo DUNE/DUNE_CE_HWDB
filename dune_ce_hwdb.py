@@ -275,6 +275,15 @@ def GetUTC(date, time):
     else:
         return None
 
+def ConvertDate(date):
+    if "-" in date and "/" not in date:
+        return date
+    elif "/" in date:
+        return date.replace("/", "-")
+    elif "-" not in date:
+        print(f"Print test date doesn't have the accpted format. {date}")
+        exit(1)
+
 def ConvertToJSON(data):
     json_data = ""
     for line in data:
@@ -644,8 +653,8 @@ def isTestInHWDB(item_id, qc_type, qc_date, qc_time):
             test_type   = testsTypesList[i]
             test_num    = testsIDsList[i]
 
-            if commverb == 'VERB1': print(test_date, test_time ,test_num)
-            if (test_date == qc_date) and (test_time == qc_time) and (test_type == qc_type):
+            if commverb == 'VERB1': print(test_num, test_date, qc_date, test_time, qc_time, test_type, qc_type)
+            if (ConvertDate(test_date) == ConvertDate(qc_date)) and (test_time == qc_time) and (test_type == qc_type):
                 found_test = True
                 found_test_id = test_num
 

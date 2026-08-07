@@ -34,7 +34,10 @@ def SubmitColdADCCTSQCTest():
     filenames = getnames.readlines()
     prev = 0
     prev_sn = 0
+    prev_temp = None
     num_chips = 0
+    not_in_hwdb = []
+    short_list = []
     for fn in filenames:
         datasheet = [[None for _ in range(10)] for _ in range(2)]
 
@@ -88,11 +91,13 @@ def SubmitColdADCCTSQCTest():
         plotfiles = "ls "+fn+"/*.png"       
         getplotfiles = os.popen(plotfiles)
         filelist = getplotfiles.readlines()
+
 #        print(len(filelist))
         if len(filelist)<21:
 #            print(len(filelist))
-#            print(fn)
-            continue
+#            if ("2422-" in serial):
+#                short_list.append(serial)
+                continue
 
         with open(testfile) as f:
             for line in f:
@@ -123,25 +128,40 @@ def SubmitColdADCCTSQCTest():
         elif testtype == "ln":
             testname = "CryoT QC Test"
 #        filelist_pdf = [testfile, pdf_plot_report_name]
-        if ("2422-08243" in serial): #and prev_sn != serial and testtype =="rt":# and serial == "2502-18611":
-            prev_sn = serial
+        if "2502-" in serial and int(sn[serofs]) < 20000:# and serial == "2502-18611":
+#            if serial == prev_sn and prev_temp == testtype:
+            print(num_chips, serial, testtype)
             num_chips = num_chips + 1
-            print(asic[1], ", ", serial, ", ", testname, ", ", date, ", ", testtime) 
+            prev_temp  = testtype
+            prev_sn = serial
+#            if serial in short_list:
+#                num_chips = num_chips + 1
+#                print(serial)
+#            print(asic[1], ", ", serial, ", ", testname, ", ", date, ", ", testtime) 
 #            print(datasheet)
-            print(testtype, testname)
+#            print(testtype, testname)
 #            print(filelist)
 #            print(convert_to_pdf_command)
 #            os.popen(convert_to_pdf_command)
 
-#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb2", serial, "FNAL", "US", "", "15", "NBMY62.00", "2025-01-10 00:00:00")
+            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "FNAL", "US", "", "15", "NBMY62.00", "2025-01-10 00:00:00")
 #            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "LSU", "US", "", "59", "NBMY62.00", "2025-02-27 00:00:00")
-#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb2", serial, "BNL", "US", "", "15", "NBMY62.00", "2025-06-04 00:00:00")
-#            dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prb1", serial, testname, "No comment", datasheet)
-#            dune_ce_hwdb.EnterFileToTest("coldadc_p2prb1", serial, testname, datasheet, filelist)
-#            itemID = dune_ce_hwdb.isPartInHWDB("coldadc_p2prb2", serial)
-#            dune_ce_hwdb.PatchItem(itemID, 120, None , None, True, None, 15, "NBMY62.00")
-    print(num_chips)
+#            dune_ce_hwdb.EnterItemToHWDB("coldadc_p2prb1", serial, "BNL", "US", "", "15", "NBMY62.00", "2025-06-04 00:00:00")
 
+            itemID = dune_ce_hwdb.isPartInHWDB("coldadc_p2prb1", serial)
+            if itemID != None:
+#                if num_chips > 824:
+                dune_ce_hwdb.EnterTestToHWDB("coldadc_p2prb1", serial, testname, "No comment", datasheet)
+                dune_ce_hwdb.EnterFileToTest("coldadc_p2prb1", serial, testname, datasheet, filelist)
+#            #itemID = dune_ce_hwdb.isPartInHWDB("coldadc_p2prb1", serial)
+                dune_ce_hwdb.PatchItem(itemID, 120, None , None, True, None)
+            else:
+                not_in_hwdb.append(serial)
+
+    print(num_chips)
+    print(len(short_list))
+    print(short_list)
+    print(not_in_hwdb)
 if __name__ == '__main__':
 
     SubmitColdADCCTSQCTest()
