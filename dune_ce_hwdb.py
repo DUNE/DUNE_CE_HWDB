@@ -781,7 +781,7 @@ def UpdateLocation(item_id, institution = siteloc, comments = "", arrival_date =
         loc_id["id"] = institution_id
         loc_data["location"] = loc_id
 
-        print(json.dumps(loc_data, indent = 4))
+#        print(json.dumps(loc_data, indent = 4))
 
         url = download_url + "/components/" + item_id + "/locations"
 #        update_loc = requests.post(url, json=loc_data, headers=headers)
